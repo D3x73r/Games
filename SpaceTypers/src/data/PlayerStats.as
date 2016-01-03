@@ -2,6 +2,7 @@ package data
 {
 	import flash.utils.getTimer;
 	import flash.utils.Timer;
+	import utils.typingeffort.LetterMap;
 	
 	/**
 	 * ...
@@ -10,23 +11,23 @@ package data
 	
 	public class PlayerStats
 	{
-		private var _playerId:int;
-		private var _score:int = 0;
-		private var _wpm:int = 0;
-		private var _accuracy:Number = 0;
-		private var _accuracyCount:int = 0;
-		private var _leftHandErrCount:int = 0;
-		private var _rightHandErrCount:int = 0;
-		private var _weakHand:String = '';
-		private var _indexFingerErrCount:int = 0;
-		private var _middleFingerErrCount:int = 0;
-		private var _ringFingerErrCount:int = 0;
-		private var _pinkyFingerErrCount:int = 0;
-		private var _maxFingerErrCount:int = 0
-		private var _weakFinger:String = 'none';
+		private var _playerId:int; //
+		private var _score:int = 0;//
+		private var _wpm:int = 0;//
+		private var _accuracy:Number = 0; //
+		private var _accuracyCount:int = 0; //
+		private var _leftHandErrCount:int = 0;//
+		private var _rightHandErrCount:int = 0;//
+		private var _weakHand:String = '';//
+		private var _indexFingerErrCount:int = 0;//
+		private var _middleFingerErrCount:int = 0;//
+		private var _ringFingerErrCount:int = 0;//
+		private var _pinkyFingerErrCount:int = 0;//
+		private var _maxFingerErrCount:int = 0//
+		private var _weakFinger:String = 'none';//
 		private var _date:uint;
-		private var _timeMain:Number = 0;
-		private var _completedWords:int = 0;
+		private var _timeMain:Number = 0;//
+		private var _completedWords:int = 0;//
 		
 		
 		public function PlayerStats($playerId:int)
@@ -79,6 +80,38 @@ package data
 		{
 			_accuracyCount++;
 			_accuracy += $value;
+		}
+		
+		public function handleFingerHandErrCount($letterMap:LetterMap):void
+		{
+			switch($letterMap.finger)
+			{
+				case 0: 
+				case 9: 
+					pinkyFingerErrCount++;
+					break;
+				case 1: 
+				case 8: 
+					ringFingerErrCount++;
+					break;
+				case 2: 
+				case 7: 
+					middleFingerErrCount++;
+					break;
+				case 3: 
+				case 6: 
+					indexFingerErrCount++;
+					break;
+			}
+			
+			if ($letterMap.finger > 3)
+			{
+				rightHandErrCount++;
+			}
+			else
+			{
+				leftHandErrCount++;
+			}
 		}
 		
 		public function get leftHandErrCount():int 
