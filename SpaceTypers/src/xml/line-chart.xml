@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lineChart>
+	<config>
+		<chartarea x="50" y="50" width="400" height="200" backColor1="0xfafafa" backColor2="0xf1f1f1" xMargin="20" borderColor="0xbdbdbd" borderThick="2" borderAlpha="1" />
+		<yaxis tagSize="10" tagColor="0x587b8c" tagMargin="3" min="0" max="10" intervals="5" decimals="1" />
+		<xaxis tagSize="10" tagColor="0x587b8c" tagMargin="1" />
+		<gridlines thick="1" color="0xcdcdcd" alpha="0.8" />
+		<legends visible="true" x="480" y="50" width="100" square="10" textSize="12" textColor="0x5e7086" backColor="0xFFFFFF" backAlpha="1" borderColor="0x587b8c" borderThick="1" borderAlpha="1" legendBackColor="0xf2f2f2" />
+		<points radius="3" />
+		<tooltip size="10" xmargin="2" ymargin="0" />
+		<animation openTime="0.5" moveTime="0.5" synchronized="false" />
+	</config>
+	<series>
+		<serie lineColor="0xDD0000" thick="2" pointInteriorColor="0xFF3333" pointBorderColor="0xDD0000" tooltipBackColor="0xFF3333" tooltipTextColor="0xFFFFFF" name="Main site" />
+		<serie lineColor="0xf99d39" thick="1" pointInteriorColor="0xfbc891" pointBorderColor="0xf99d39" tooltipBackColor="0xfbc891" tooltipTextColor="0x000000" name="Own sites" />
+		<serie lineColor="0x00AA00" thick="1" pointInteriorColor="0x55FF55" pointBorderColor="0x00AA00" tooltipBackColor="0x55FF55" tooltipTextColor="0x000000" name="Partner webs" />
+		<serie lineColor="0x000099" thick="1" pointInteriorColor="0x5555FF" pointBorderColor="0x000099" tooltipBackColor="0x5555FF" tooltipTextColor="0xFFFFFF" name="Other" />
+	</series>
+	<periods>
+		<period name="Aug.09">
+			<v>2.5</v><v>3.5</v><v>6.5</v><v>8.5</v>
+		</period>
+		<period name="Sep.09">
+			<v>5</v><v>4.5</v><v>5.5</v><v>9</v>
+		</period>
+		<period name="Oct.09">
+			<v>4</v><v>5</v><v>8</v><v>7</v>
+		</period>
+		<period name="Nov.09">
+			<v>6</v><v>5</v><v>7</v><v>5.5</v>
+		</period>
+		<period name="Dec.09">
+			<v>7</v><v>6</v><v>7.5</v><v>4.5</v>
+		</period>
+		<period name="Jan.10">
+			<v>9</v><v>4</v><v>6.5</v><v>3.5</v>
+		</period>
+		<period name="Feb.10">
+			<v>8</v><v>5</v><v>8.5</v><v>1</v>
+		</period>
+		
+	</periods>
+</lineChart>
