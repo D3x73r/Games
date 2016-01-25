@@ -1,7 +1,9 @@
 package game
 {
+	import data.Player;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.filesystem.File;
 	import flash.net.URLLoader;
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
@@ -22,26 +24,48 @@ package game
 		private var _codeNames:Array;
 		private var _level:int;
 		private var _keyBoardId:int;
+		private var _playerId:int;
 		private var _asteroidMinSpeed:Number = 2;
 		private var _asteroidMaxSpeed:Number = 5;
 		private var _wordsObjDb:Object;
+		private var _wordsLoaded:Boolean;
 		
 		public function LevelParams()
 		{
 			
 		}
 		
-		public function init($level:int, $keyBoardId:int):void
+		public function init($level:int, $keyBoardId:int, $currentPlayer:Player):void
 		{
 			_level = $level;
-			_keyBoardId = $keyBoardId;
 			
-			loadWords();
+			if (_wordsLoaded && _keyBoardId == $keyBoardId && _playerId == $currentPlayer.playerId)
+			{
+				var startId:int = _level < 10 ? 0 : _level - 10;
+				var endId:int = int( ( ( _codeNames.length - 1 )  * _level) / 100);
+				
+				_codeNames = _codeNames.slice(startId, endId);
+				
+				//
+				//for (var i:int = 0;  i < _codeNames.length; i++ )
+				//{
+					//trace(_codeNames[i].word);
+				//}
+				
+				dispatchEvent(new Event(EVENT_LEVEL_PARAMS_SET));
+			}
+			else
+			{
+				_keyBoardId = $keyBoardId;
+				_playerId = $currentPlayer.playerId;
+				loadWords();
+			}
 		}
 		
 		private function loadWords():void
 		{
-			var request:URLRequest = new URLRequest('words' + _KEYBOARDS[keyBoardId] + '.st');
+			var wordsFile:File = File.documentsDirectory.resolvePath('SpaceTypers/' + _playerId + '/words' + _KEYBOARDS[keyBoardId] + '.st');
+			var request:URLRequest = new URLRequest(wordsFile.url);
 			var loader:URLLoader = new URLLoader(request);
 			
 			loader.dataFormat = URLLoaderDataFormat.BINARY;
@@ -50,21 +74,21 @@ package game
 		
 		private function fileLoadedHandler($e:Event):void
 		{
-			// Retrieve the event target, cast as the URLLoader we just created
 			var loader:URLLoader = $e.target as URLLoader;
+			var dataObj:ByteArray = loader.data as ByteArray;
+			var obj:Object = dataObj.readObject();
+			var tmpArr:Array = obj.words;
+			var startId:int = _level < 10 ? 0 : _level - 10;
+			var endId:int = int( ( ( tmpArr.length - 1 )  * _level) / 100);
 			
-			// Retrieve the loaded data. We know it's a ByteArray, so let's cast it as well.
-			var data:ByteArray = loader.data as ByteArray;
+			_wordsLoaded = true;
 			
-			// Use the ByteArray.readObject method to reconstruct the object.
-			var obj:Object = data.readObject();
+			_codeNames = tmpArr.slice(startId, endId);
 			
-			_codeNames = obj.words;
-			//
-			//for (var i:int = 0;  i < _codeNames.length; i++ )
-			//{
-				//trace(_codeNames[i].word);
-			//}
+			for (var i:int = 0;  i < _codeNames.length; i++ )
+			{
+				trace(_codeNames[i].word);
+			}
 			
 			dispatchEvent(new Event(EVENT_LEVEL_PARAMS_SET));
 		}

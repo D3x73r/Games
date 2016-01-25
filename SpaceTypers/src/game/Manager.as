@@ -163,9 +163,12 @@ package game
 		private function showMenu():void
 		{
 			dbConnect.savePlayerScore(_currentPlayer);
-
+			
 			_currentPlayer.stats = null;
 			
+			_level = 1;
+			_asteroidsPerLevel = 2;
+					
 			state = STATE_MENU
 		}
 		
@@ -208,21 +211,19 @@ package game
 						header.txtScore.text = _currentPlayer.stats.score.toString();
 					}
 					
-					_levelParams = new LevelParams();
+					if(_levelParams == null) _levelParams = new LevelParams();
 					_levelParams.addEventListener(LevelParams.EVENT_LEVEL_PARAMS_SET, onLevelParamsSet);
 					_level++;
 					_asteroidsPerLevel++;
 					
 					if (_asteroidsPerLevel >= 15) _asteroidsPerLevel = 15;
 					
-					_levelParams.init(_level, keyBoardId);
+					_levelParams.init(_level, keyBoardId, _currentPlayer);
 					break;
 				case STATE_GAME_OVER: 
 					dbConnect.savePlayerScore(_currentPlayer);
 					
 					_currentPlayer.stats = null;
-					_level = 1;
-					_asteroidsPerLevel = 2;
 					
 					transition.hide();
 					handleButtons();
@@ -296,7 +297,7 @@ package game
 				//trace('k=', k)
 				setTimeout(function()
 					{
-						var randomId:int = random(0, int(_levelParams.codeNames.length - (_levelParams.codeNames.length / 3)))
+						var randomId:int = random(0, _levelParams.codeNames.length - 1);
 						var codeName:CodeName = new CodeName(_levelParams.codeNames[randomId].word, -25, -10, _levelParams.codeNames[randomId].effort);
 						var asteroid:Asteroid = new Asteroid(codeName, randomNumber(0.2, 0.6));
 						
@@ -357,7 +358,7 @@ package game
 						
 						if (dbConnect.hasRegisteredPlayers)
 						{
-							id = dbConnect.allPlayers[dbConnect.allPlayers.length - 1].stats.playerId + 1;
+							id = dbConnect.allPlayers[dbConnect.allPlayers.length - 1].playerId + 1;
 						}
 						else
 						{
@@ -393,6 +394,18 @@ package game
 		private function onPlayerRegistered($e:Event):void
 		{
 			dbConnect.removeEventListener(dbConnect.EVENT_PLAYER_REGSTERED, onPlayerRegistered);
+			
+			var dir:File = File.documentsDirectory.resolvePath('SpaceTypers/' + _currentPlayer.playerId.toString() + '/');
+			dir.createDirectory();
+			
+			var qwertyFile:File = File.applicationDirectory.resolvePath('words_qwerty.st')
+			qwertyFile.copyTo(dir.resolvePath(qwertyFile.name), true);
+			
+			var dvorakFile:File = File.applicationDirectory.resolvePath('words_dvorak.st')
+			dvorakFile.copyTo(dir.resolvePath(dvorakFile.name), true);
+			
+			var colemakFile:File = File.applicationDirectory.resolvePath('words_colemak.st')
+			colemakFile.copyTo(dir.resolvePath(colemakFile.name), true);
 			
 			state = STATE_MENU;
 		}

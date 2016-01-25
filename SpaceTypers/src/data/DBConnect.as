@@ -199,11 +199,12 @@ package data
 		
 		public function registerPlayer($player:Player):void
 		{
+			trace($player)
 			var q:SQLStatement = new SQLStatement();
 			q.sqlConnection = _connMainDB;
 			q.clearParameters();
 			q.text = "INSERT  INTO 'Players' VALUES( :id, :nick, :name, :lname )";
-			q.parameters[':id'] = $player.stats.playerId;
+			q.parameters[':id'] = $player.playerId;
 			q.parameters[':nick'] = $player.nick;
 			q.parameters[':name'] = $player.name;
 			q.parameters[':lname'] = $player.lastName;
