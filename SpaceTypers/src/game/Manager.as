@@ -27,7 +27,6 @@ package game
 	import flash.events.MouseEvent;
 	import flash.filesystem.File;
 	import flash.geom.Point;
-	import flash.system.Worker;
 	import flash.text.TextField;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
@@ -37,7 +36,6 @@ package game
 	import utils.Lang;
 	import utils.random;
 	import utils.randomNumber;
-	import utils.typingeffort.LetterMap;
 	import utils.typingeffort.Letters;
 	import utils.Verification;
 	import xml.ChartData;
@@ -139,7 +137,6 @@ package game
 		private var _asteroidsPerLevel:int = 2;
 		private var _keyBoardId:int = -1;
 		private var _wordTimeStart:int;
-		private var _currLetterMap:LetterMap;
 		
 		public function Manager()
 		{
@@ -155,7 +152,7 @@ package game
 		private function showMenu():void
 		{
 			dbConnect.savePlayerScore(_currentPlayer);
-
+			
 			_currentPlayer.stats = null;
 			
 			state = STATE_MENU
@@ -530,22 +527,17 @@ package game
 		private function checkLetter($letter:String):void
 		{
 			//trace('3333333333333333')
-			_currLetterMap = Letters.getMap(_currentAsteroid.codeNameTxt.currentLetter.toLowerCase(), keyBoardId);
-			
 			if (_currentAsteroid.codeNameTxt.currentLetter == $letter)
 			{
-				
 				shoot();
 				
 				_currentAsteroid.codeNameTxt.removeLetter();
 				_currentAsteroid.codeNameTxt.textStyle = _currentAsteroid.codeNameTxt.TEXT_STYLE_ACTIVE;
 				handsPanel.finger = Letters.getMap(_currentAsteroid.codeNameTxt.currentLetter.toLowerCase(), keyBoardId).finger;
-				
 			}
 			else
 			{
 				_currentAsteroid.codeNameTxt.textStyle = _currentAsteroid.codeNameTxt.TEXT_STYLE_ERROR;
-				_currentPlayer.stats.handleFingerHandErrCount(_currLetterMap);
 			}
 		}
 		
@@ -612,7 +604,7 @@ package game
 			}
 			else
 			{
-				//trace('this shoud not happen twice!')
+				trace('this shoud not happen twice!')
 				transition.show( function()
 					{
 						state = STATE_GAME_SCORE;
@@ -625,11 +617,13 @@ package game
 		
 		private function setFinalScore():void
 		{
+			trace('SET FINAL SCORE!!!!!!!!!!!!', txtFinalScore)
 			txtFinalScore.text = _currentPlayer.stats.score.toString();
 		}
 		
 		private function updateResultData($e:GameResultEvent):void
 		{
+			//trace('game result: ', $e.win)
 			_currentPlayer.stats.score += $e.win;
 			_currentPlayer.stats.accuracy = $e.accuracy;
 			
