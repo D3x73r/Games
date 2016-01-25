@@ -1,27 +1,30 @@
 package utils.workers 
 {
+	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
 	import flash.system.MessageChannel;
 	import flash.system.Worker;
 	import flash.system.WorkerDomain;
+	import flash.utils.ByteArray;
 	
 	/**
 	 * ...
 	 * @author F43841 Hristo Dimitrov
 	 */
 	
-	public class TypingEffortWorker extends EventDispatcher 
+	public class TypingEffortWorker extends Sprite
 	{
-		public var WorkerSWF:Class;
+		[Embed(source="../../../EffortCalculator.swf", mimeType="application/octet-stream")]
+		private var WorkerSWF:Class;
+		
 		private var _worker:Worker;
 		private var _backToMainCh:MessageChannel;
 		private var _mainToBackCh:MessageChannel;
+		private var _memory:ByteArray;
 		
-		public function TypingEffortWorker(target:flash.events.IEventDispatcher=null) 
+		public function TypingEffortWorker() 
 		{
-			super(target);
+			super();
 			
 			_worker = WorkerDomain.current.createWorker(new WorkerSWF());
 			_backToMainCh = _worker.createMessageChannel(Worker.current);
@@ -29,12 +32,27 @@ package utils.workers
 			
 			_backToMainCh.addEventListener(Event.CHANNEL_MESSAGE, onBackToMain);
 			
+			_worker.setSharedProperty('btm', _backToMainCh);
+			_worker.setSharedProperty('mtb', _mainToBackCh);
+			
 			_worker.start();
+			_memory = _backToMainCh.receive(true);
 		}
 		
 		private function onBackToMain($e:Event):void 
 		{
+			if (_backToMainCh.messageAvailable)
+			{
+				trace(_backToMainCh.receive());
+			}
+		}
+		
+		public function sendData($byteArray:ByteArray):void
+		{	
+			_memory.length = 0;
+			_memory.writeBytes($byteArray);
 			
+			_mainToBackCh.send('INCOMMING_DATA');	
 		}
 		
 	}

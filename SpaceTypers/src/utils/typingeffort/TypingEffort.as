@@ -1,16 +1,12 @@
 package utils.typingeffort
 {
-	import flash.display.Sprite;
-	import flash.utils.ByteArray;
 	/**
 	 * ...
 	 * @author Hristo Dimitrov F43841
 	 */
 	
-	public final class TypingEffort extends Sprite
+	public final class TypingEffort
 	{
-		private var _memory:ByteArray;
-		
 		private static var _typingEffort:Number;
 		private static var _triadEffort:Number;
 		private static var _currentTriad:String;
@@ -55,7 +51,7 @@ package utils.typingeffort
 		
 		public function TypingEffort()
 		{
-			_memory.shareable = true;
+			
 		}
 		
 		public function calc($word:String):Number {

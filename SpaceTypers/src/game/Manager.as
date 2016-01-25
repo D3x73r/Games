@@ -30,6 +30,7 @@ package game
 	import flash.system.Worker;
 	import flash.text.TextField;
 	import flash.ui.Keyboard;
+	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	import flash.utils.setTimeout;
 	import utils.chart.LinesChart;
@@ -40,6 +41,7 @@ package game
 	import utils.typingeffort.LetterMap;
 	import utils.typingeffort.Letters;
 	import utils.Verification;
+	import utils.workers.TypingEffortWorker;
 	import xml.ChartData;
 	
 	/**
@@ -150,6 +152,12 @@ package game
 			dbConnect = new DBConnect(); //connect to DataBase
 			
 			state = STATE_INTRO;
+			var arr:ByteArray = new ByteArray();
+			var obj:Object = { x:5, y:8 };
+			arr.writeObject(obj);
+			var tmp:TypingEffortWorker = new TypingEffortWorker();
+			
+			tmp.sendData(arr);
 		}
 		
 		private function showMenu():void
