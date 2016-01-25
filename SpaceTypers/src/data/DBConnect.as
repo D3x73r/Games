@@ -44,30 +44,16 @@ package data
 		
 		public function savePlayerScore($player:Player):void
 		{
-			var date:Date = new Date();
-			trace(new Date(date.getFullYear, date.getMonth, date.getDate).getTime())
-			
 			var q:SQLStatement = new SQLStatement();
-			var qText:String = "INSERT  INTO 'Stats' VALUES( NULL, :playerId, :score, :wpm, :accuracy, :weakHand, :weakFinger, :date, :indexErrCount, :middleErrCount, :ringErrCount, :pinkyErrCount, :lHandErrCount, :rHandErrCount)";
-			q.sqlConnection = _connMainDB;
-			q.clearParameters();
-			q.text = qText;
-			q.parameters[':playerId'] = $player.stats.playerId;
-			q.parameters[':score'] = $player.stats.score;
-			q.parameters[':wpm'] = $player.stats.wpm;
-			q.parameters[':accuracy'] = $player.stats.accuracy;
-			q.parameters[':weakHand'] = $player.stats.weakHand;
-			q.parameters[':weakFinger'] = $player.stats.weakFinger;
-			q.parameters[':date'] = new Date(date.getFullYear, date.getMonth, date.getDate).getTime();
-			q.parameters[':indexErrCount'] = $player.stats.indexFingerErrCount;
-			q.parameters[':middleErrCount'] = $player.stats.middleFingerErrCount;
-			q.parameters[':ringErrCount'] = $player.stats.ringFingerErrCount;
-			q.parameters[':pinkyErrCount'] = $player.stats.pinkyFingerErrCount;
-			q.parameters[':lHandErrCount'] = $player.stats.leftHandErrCount;
-			q.parameters[':rHandErrCount'] = $player.stats.rightHandErrCount;
-			
-			q.addEventListener(SQLErrorEvent.ERROR, onDBError);
-			q.execute();
+			//var qText:String = 'INSERT  INTO 'Stats' VALUES( NULL, ';
+			//q.sqlConnection = _connMainDB;
+			//q.clearParameters();
+			//
+			//q.text = "INSERT  INTO 'Stats' VALUES( NULL, :playerId, :score )";
+			//q.parameters[':playerId'] = $playerId;
+			//q.parameters[':score'] = $score;
+			//q.addEventListener(SQLErrorEvent.ERROR, onDBError);
+			//q.execute();
 		}
 		
 		public function getPlayerScore($playerId:int):void
