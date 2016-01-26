@@ -11,41 +11,27 @@ package data
 	
 	public class PlayerStats
 	{
-		private var _playerId:int; //
-		private var _score:int = 0;//
-		private var _wpm:int = 0;//
-		private var _accuracy:Number = 0; //
-		private var _accuracyCount:int = 0; //
-		private var _leftHandErrCount:int = 0;//
-		private var _rightHandErrCount:int = 0;//
-		private var _weakHand:String = '';//
-		private var _indexFingerErrCount:int = 0;//
-		private var _middleFingerErrCount:int = 0;//
-		private var _ringFingerErrCount:int = 0;//
-		private var _pinkyFingerErrCount:int = 0;//
-		private var _maxFingerErrCount:int = 0//
-		private var _weakFinger:String = 'none';//
-		private var _date:uint;
-		private var _timeMain:Number = 0;//
-		private var _completedWords:int = 0;//
+		private var _playerId:int;
+		private var _score:int = 0;
+		private var _wpm:int = 0;
+		private var _accuracy:Number = 0; 
+		private var _accuracyCount:int = 0; 
+		private var _leftHandErrCount:int = 0;
+		private var _rightHandErrCount:int = 0;
+		private var _weakHand:String = '';
+		private var _indexFingerErrCount:int = 0;
+		private var _middleFingerErrCount:int = 0;
+		private var _ringFingerErrCount:int = 0;
+		private var _pinkyFingerErrCount:int = 0;
+		private var _timeMain:Number = 0;
+		private var _completedWords:int = 0;
+		private var _keyboardId:int = -1;
 		
 		
-		public function PlayerStats($playerId:int)
+		public function PlayerStats($playerId:int, $keyBoardId:int)
 		{
-			var date:Date = new Date();
-			 
-			_date = date.getTime();
 			_playerId = $playerId;
-			
-		}
-		
-		private function calcWeakFinger($errCount:int, $finger:String):void
-		{
-			if ($errCount > _maxFingerErrCount)
-			{
-				_maxFingerErrCount = $errCount;
-				_weakFinger = $finger; 
-			}
+			_keyboardId = $keyBoardId;
 		}
 		
 		//Getters and Setters
@@ -148,7 +134,6 @@ package data
 		public function set indexFingerErrCount($value:int):void 
 		{
 			_indexFingerErrCount = $value;
-			calcWeakFinger(_indexFingerErrCount, 'index');
 		}
 		
 		public function get middleFingerErrCount():int 
@@ -159,7 +144,6 @@ package data
 		public function set middleFingerErrCount($value:int):void 
 		{
 			_middleFingerErrCount = $value;
-			calcWeakFinger(_middleFingerErrCount, 'middle');
 		}
 		
 		public function get ringFingerErrCount():int 
@@ -170,7 +154,6 @@ package data
 		public function set ringFingerErrCount($value:int):void 
 		{
 			_ringFingerErrCount = $value;
-			calcWeakFinger(_ringFingerErrCount, 'ring');
 		}
 		
 		public function get pinkyFingerErrCount():int 
@@ -181,14 +164,7 @@ package data
 		public function set pinkyFingerErrCount($value:int):void 
 		{
 			_pinkyFingerErrCount = $value;
-			calcWeakFinger(_pinkyFingerErrCount, 'pinky');
 		}
-		
-		public function get weakFinger():String 
-		{
-			return _weakFinger;
-		}
-		
 		
 		public function get completedWords():int 
 		{
@@ -208,6 +184,11 @@ package data
 		public function set timeMain($value:Number):void 
 		{
 			_timeMain = $value;
+		}
+		
+		public function get keyboardId():int 
+		{
+			return _keyboardId;
 		}
 	
 	}

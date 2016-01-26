@@ -162,14 +162,17 @@ package game
 		
 		private function showMenu():void
 		{
-			dbConnect.savePlayerScore(_currentPlayer);
-			
-			_currentPlayer.stats = null;
-			
-			_level = 1;
-			_asteroidsPerLevel = 2;
+			dbConnect.addEventListener(dbConnect.EVENT_STATS_INSERTED, function onStatsInserted() {
+					dbConnect.removeEventListener(dbConnect.EVENT_STATS_INSERTED, onStatsInserted);
+					_currentPlayer.stats = null;
 					
-			state = STATE_MENU
+					_level = 1;
+					_asteroidsPerLevel = 2;
+						
+					state = STATE_MENU;
+				});
+				
+			dbConnect.savePlayerScore(_currentPlayer);
 		}
 		
 		private function onStateChange($e:Event):void
@@ -205,7 +208,7 @@ package game
 					
 					break;
 				case STATE_GAME: 
-					if (!_currentPlayer.stats) _currentPlayer.stats = new PlayerStats(_currentPlayer.playerId);
+					if (!_currentPlayer.stats) _currentPlayer.stats = new PlayerStats(_currentPlayer.playerId, keyBoardId);
 					if (header.txtScore)
 					{
 						header.txtScore.text = _currentPlayer.stats.score.toString();
@@ -221,10 +224,6 @@ package game
 					_levelParams.init(_level, keyBoardId, _currentPlayer);
 					break;
 				case STATE_GAME_OVER: 
-					dbConnect.savePlayerScore(_currentPlayer);
-					
-					_currentPlayer.stats = null;
-					
 					transition.hide();
 					handleButtons();
 					break;
@@ -261,7 +260,7 @@ package game
 								//trace('no scores for this player yet!');
 							//}
 						//});
-					//dbConnect.getPlayerScore(_currentPlayer.stats.playerId);
+					//dbConnect.getPlayerStats(_currentPlayer);
 					//var chartData:ChartData = new ChartData([["aaaaaaa"], [1, 2.3], [1, 7.3], [1, 1.3], [1, 9.3]], [['bbbbbbb'], [2, 3.3], [2, 6.3], [2, 5.3], [2, 6.3]], [['vvvvvvvv'], [3, 6.3], [3, 1.3], [3, 10.3], [3, 0.3]], [['gggggggg'], [4, 16.3], [4, 11.3], [4, 13.3], [4, 1.3]]);
 					var chartData:ChartData = new ChartData([1,2,3,4], ["aaaaaaa", 2.3, 3.3, 6.3, 16.3], ["bbbbbbb", 1.3, 2.3, 0.3, 10.3]);
 					var lc:LinesChart = new LinesChart(chartData.data);

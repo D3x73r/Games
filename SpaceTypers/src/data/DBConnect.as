@@ -15,15 +15,15 @@ package data
 	
 	public class DBConnect extends EventDispatcher
 	{
-		public const EVENT_DATA_LOADED:String = 'data_loaded';
-		public const EVENT_SCORES_LOADED:String = 'data_loaded';
+		public const EVENT_DATA_LOADED:String = 'event_data_loaded';
+		public const EVENT_STATS_LOADED:String = 'event_stats_loaded';
 		public const EVENT_MAIN_DB_CREATED:String = 'event_main_db_created';
-		public const EVENT_PLAYER_REGSTERED:String = 'player_registered';
+		public const EVENT_PLAYER_REGSTERED:String = 'event_player_regstered';
+		public const EVENT_STATS_INSERTED:String = 'event_stats_inserted';
 		
 		public const MAIN_DB_NAME:String = 'STypers.db';
 		public const STATS_DB_NAME:String = 'STypersStats.db';
 		
-		private var _scores:Array;
 		private var _hasRegisteredPlayers:Boolean = false;
 		private var _hasScores:Boolean = false;
 		
@@ -33,8 +33,8 @@ package data
 		private var _allPlayers:Vector.<Player>;
 		
 		//Stats
-		private var _playerId:int = -1;
-		private var _score:int = -1;
+		private var _allStats:Array;
+		private var _scores:Array;
 		
 		public function DBConnect()
 		{
@@ -44,11 +44,77 @@ package data
 		
 		public function savePlayerScore($player:Player):void
 		{
-			var date:Date = new Date();
-			trace(new Date(date.getFullYear, date.getMonth, date.getDate).getTime())
+			
+			addEventListener(EVENT_STATS_LOADED, function onLoaded($e:Event) {
+					removeEventListener(EVENT_STATS_LOADED, onLoaded);
+					
+					doSavePlayerScore($player)
+				});
+			
+			getPlayerStats($player);
+		}
+		
+		private function doSavePlayerScore($player:Player):void
+		{
+			var counter:int = 0;
+			var indexErrCount:int = $player.stats.indexFingerErrCount;
+			var middleErrCount:int = $player.stats.middleFingerErrCount;
+			var ringErrCount:int = $player.stats.ringFingerErrCount;
+			var pinkyErrCount:int = $player.stats.pinkyFingerErrCount;
+			var lHandErrCount:int = $player.stats.leftHandErrCount;
+			var rHandErrCount:int = $player.stats.rightHandErrCount;
+			var currentDate:Date = new Date();
+			var weakFinger:String;
+			var weakHand:String;
+			var maxErrCount:int;
+			
+			if (_allStats != null && _allStats.length > 0)
+			{
+				var lastStat:Object = _allStats[_allStats.length - 1]; 
+				var days:int = int(((((currentDate.getTime() - lastStat.date) / 1000) / 60) / 60) / 24);
+				
+				if (days < 30 && lastStat.counter <= 100)
+				{
+					counter = lastStat.counter + 1;
+					
+					indexErrCount += lastStat.indexErrCount;
+					middleErrCount +=  lastStat.middleErrCount;
+					ringErrCount += lastStat.ringErrCount;
+					pinkyErrCount += lastStat.pinkyErrCount
+					
+					lHandErrCount += lastStat.lHandErrCount;
+					rHandErrCount += lastStat.rHandErrCount;
+				}
+			}
+			
+			maxErrCount = indexErrCount;
+			weakFinger = 'index';
+			if (middleErrCount > maxErrCount) 
+			{
+				maxErrCount = middleErrCount;
+				weakFinger = 'middle';
+			}
+			if (ringErrCount > maxErrCount) 
+			{
+				maxErrCount = ringErrCount;
+				weakFinger = 'ring';
+			}
+			if (ringErrCount > maxErrCount) 
+			{
+				maxErrCount = ringErrCount;
+				weakFinger = 'pinky';
+			}
+			
+			if (indexErrCount == 0 && middleErrCount == 0 && ringErrCount == 0 && pinkyErrCount == 0) weakFinger = 'none';
+			
+			if (lHandErrCount > rHandErrCount) weakHand = 'left';
+			else weakHand = 'right';
+			
+			if (lHandErrCount == 0 && rHandErrCount == 0) weakHand = 'none';
 			
 			var q:SQLStatement = new SQLStatement();
-			var qText:String = "INSERT  INTO 'Stats' VALUES( NULL, :playerId, :score, :wpm, :accuracy, :weakHand, :weakFinger, :date, :indexErrCount, :middleErrCount, :ringErrCount, :pinkyErrCount, :lHandErrCount, :rHandErrCount)";
+			var qText:String = "INSERT  INTO 'Stats' VALUES( NULL, :playerId, :score, :wpm, :accuracy, :weakHand, :weakFinger, :date, :indexErrCount, :middleErrCount, :ringErrCount, :pinkyErrCount, :lHandErrCount, :rHandErrCount, :counter, :keyBoardId)";
+			
 			q.sqlConnection = _connMainDB;
 			q.clearParameters();
 			q.text = qText;
@@ -56,56 +122,70 @@ package data
 			q.parameters[':score'] = $player.stats.score;
 			q.parameters[':wpm'] = $player.stats.wpm;
 			q.parameters[':accuracy'] = $player.stats.accuracy;
-			q.parameters[':weakHand'] = $player.stats.weakHand;
-			q.parameters[':weakFinger'] = $player.stats.weakFinger;
-			q.parameters[':date'] = new Date(date.getFullYear, date.getMonth, date.getDate).getTime();
-			q.parameters[':indexErrCount'] = $player.stats.indexFingerErrCount;
-			q.parameters[':middleErrCount'] = $player.stats.middleFingerErrCount;
-			q.parameters[':ringErrCount'] = $player.stats.ringFingerErrCount;
-			q.parameters[':pinkyErrCount'] = $player.stats.pinkyFingerErrCount;
-			q.parameters[':lHandErrCount'] = $player.stats.leftHandErrCount;
-			q.parameters[':rHandErrCount'] = $player.stats.rightHandErrCount;
+			q.parameters[':weakHand'] = weakHand;
+			q.parameters[':weakFinger'] = weakFinger;
+			q.parameters[':date'] = new Date().getTime();
+			q.parameters[':indexErrCount'] = indexErrCount;
+			q.parameters[':middleErrCount'] = middleErrCount;
+			q.parameters[':ringErrCount'] = ringErrCount;
+			q.parameters[':pinkyErrCount'] = pinkyErrCount;
+			q.parameters[':lHandErrCount'] = lHandErrCount;
+			q.parameters[':rHandErrCount'] = rHandErrCount;
+			q.parameters[':counter'] = counter;
+			q.parameters[':keyBoardId'] = $player.stats.keyboardId;
 			
+			q.addEventListener(SQLEvent.RESULT, onStatsInsert);
 			q.addEventListener(SQLErrorEvent.ERROR, onDBError);
 			q.execute();
 		}
 		
-		public function getPlayerScore($playerId:int):void
+		private function onStatsInsert($e:SQLEvent):void
+		{
+			var q:SQLStatement = $e.target as SQLStatement;
+			q.removeEventListener(SQLEvent.RESULT, onStatsInsert);
+			
+			dispatchEvent(new Event(EVENT_STATS_INSERTED));
+		}
+		
+		public function getPlayerStats($player:Player):void
 		{
 			var q:SQLStatement = new SQLStatement();
 			q.sqlConnection = _connMainDB;
-			q.text = "SELECT * FROM 'Stats' WHERE playerId=" + $playerId;
-			q.addEventListener(SQLEvent.RESULT, onScoreRecieved);
+			q.text = "SELECT * FROM 'Stats' WHERE playerId=" + $player.playerId + " AND keyBoardId=" + $player.stats.keyboardId;
+			q.addEventListener(SQLEvent.RESULT, onStatsLoaded);
 			q.addEventListener(SQLErrorEvent.ERROR, onDBError);
 			q.execute();
 		}
 		
-		private function onScoreRecieved($e:SQLEvent):void {
+		private function onStatsLoaded($e:SQLEvent):void {
 			var q:SQLStatement = $e.target as SQLStatement;
 			var res:SQLResult = q.getResult();
+			
+			q.removeEventListener(SQLEvent.RESULT, onStatsLoaded);
 			
 			_hasScores = res.data != null;
 			
 			if (_hasScores)
 			{
-				parseScoreData(res.data);
+				parseStatsData(res.data);
 			}
 			else
 			{
-				dispatchEvent(new Event(EVENT_SCORES_LOADED));
+				dispatchEvent(new Event(EVENT_STATS_LOADED));
 			}
 		}
 		
-		private function parseScoreData($data:Object):void
+		private function parseStatsData($stats:Array):void
 		{
 			_scores = [];
+			_allStats = $stats;
 			
-			for each (var sData:Object in $data)
+			for each (var stat:Object in _allStats)
 			{
-				_scores.push(sData.score);
+				_scores.push(stat.score);
 			}
 			
-			dispatchEvent(new Event(EVENT_SCORES_LOADED));
+			dispatchEvent(new Event(EVENT_STATS_LOADED));
 		}
 		
 		
@@ -179,7 +259,7 @@ package data
 			
 			var stat:SQLStatement = new SQLStatement();
 			stat.sqlConnection = _connMainDB;
-			stat.text = "CREATE TABLE IF NOT EXISTS Stats (id INTEGER PRIMARY KEY AUTOINCREMENT, " + "playerId INTEGER, score INTEGER, wpm INTEGER, accuracy REAL, weakHand TEXT, weakFinger TEXT, " + "date INTEGER, indexErrCount INTEGER, middleErrCount INTEGER, ringErrCount INTEGER, " + "pinkyErrCount INTEGER, lHandErrCount INTEGER, rHandErrCount INTEGER)";
+			stat.text = "CREATE TABLE IF NOT EXISTS Stats (id INTEGER PRIMARY KEY AUTOINCREMENT, " + "playerId INTEGER, score INTEGER, wpm INTEGER, accuracy REAL, weakHand TEXT, weakFinger TEXT, " + "date REAL, indexErrCount INTEGER, middleErrCount INTEGER, ringErrCount INTEGER, " + "pinkyErrCount INTEGER, lHandErrCount INTEGER, rHandErrCount INTEGER, counter INTEGER, keyBoardId INTEGER)";
 			stat.execute();
 		
 		}
