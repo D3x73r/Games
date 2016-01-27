@@ -19,9 +19,9 @@ package  utils.typingeffort
 		
 		//Finger / Hand pealties
 		public static const INDEX_FINGER_PANALTY:Number = 0;
-		public static const MIDDLE_FINGER_PANALTY:Number = 0;
-		public static const RING_FINGER_PANALTY:Number = 0.5;
-		public static const PINKY_FINGER_PANALTY:Number = 1;
+		public static const MIDDLE_FINGER_PANALTY:Number = 0.5;
+		public static const RING_FINGER_PANALTY:Number = 1;
+		public static const PINKY_FINGER_PANALTY:Number = 1.5;
 		
 		public static const LHAND_FINGER_ADDITIONAL_PENALTY:Number = 0;
 		public static const RHAND_FINGER_ADDITIONAL_PENALTY:Number = 0;

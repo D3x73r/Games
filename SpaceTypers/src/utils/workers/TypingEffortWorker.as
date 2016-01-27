@@ -21,6 +21,7 @@ package utils.workers
 		private var _backToMainCh:MessageChannel;
 		private var _mainToBackCh:MessageChannel;
 		private var _memory:ByteArray;
+		private var _calculating:Boolean;
 		
 		public function TypingEffortWorker() 
 		{
@@ -43,16 +44,24 @@ package utils.workers
 		{
 			if (_backToMainCh.messageAvailable)
 			{
+				_calculating = false;
+				
 				trace(_backToMainCh.receive());
 			}
 		}
 		
 		public function sendData($byteArray:ByteArray):void
 		{	
+			_calculating = true;
 			_memory.length = 0;
 			_memory.writeBytes($byteArray);
 			
 			_mainToBackCh.send('INCOMMING_DATA');	
+		}
+		
+		public function get calculating():Boolean 
+		{
+			return _calculating;
 		}
 		
 	}

@@ -18,6 +18,7 @@ package game
 	public class LevelParams extends EventDispatcher
 	{
 		public static const EVENT_LEVEL_PARAMS_SET:String = 'event_level_params_set';
+		public static var wordsLoaded:Boolean;
 		
 		private const _KEYBOARDS:Vector.<String> = new <String>['_qwerty', '_dvorak', '_colemak'];
 		
@@ -28,7 +29,6 @@ package game
 		private var _asteroidMinSpeed:Number = 2;
 		private var _asteroidMaxSpeed:Number = 5;
 		private var _wordsObjDb:Object;
-		private var _wordsLoaded:Boolean;
 		
 		public function LevelParams()
 		{
@@ -39,7 +39,7 @@ package game
 		{
 			_level = $level;
 			
-			if (_wordsLoaded && _keyBoardId == $keyBoardId && _playerId == $currentPlayer.playerId)
+			if (wordsLoaded && _keyBoardId == $keyBoardId && _playerId == $currentPlayer.playerId)
 			{
 				var startId:int = _level < 10 ? 0 : _level - 10;
 				var endId:int = int( ( ( _codeNames.length - 1 )  * _level) / 100);
@@ -81,7 +81,7 @@ package game
 			var startId:int = _level < 10 ? 0 : _level - 10;
 			var endId:int = int( ( ( tmpArr.length - 1 )  * _level) / 100);
 			
-			_wordsLoaded = true;
+			wordsLoaded = true;
 			
 			_codeNames = tmpArr.slice(startId, endId);
 			

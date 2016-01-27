@@ -149,15 +149,27 @@ package game
 			
 			addEventListener(_STATE_CHANGED, onStateChange);
 			
+			var worker:TypingEffortWorker = new TypingEffortWorker();
+				
 			dbConnect = new DBConnect(); //connect to DataBase
 			
+			dbConnect.addEventListener(dbConnect.EVENT_START_WORDS_REORDEREDING, function() {
+					if (!worker.calculating)
+					{
+						//get err counts from db connect and rearange new values for the penalties
+						// then send to worker for reorderting...
+						var arr:ByteArray = new ByteArray();
+						var obj:Object = { x:5, y:8 };
+						arr.writeObject(obj);
+						
+						worker.sendData(arr);
+					}
+				});
+			dbConnect.addEventListener(dbConnect.EVENT_WORDS_REORDERED, function() {
+					LevelParams.wordsLoaded = false;
+				});
+				
 			state = STATE_INTRO;
-			var arr:ByteArray = new ByteArray();
-			var obj:Object = { x:5, y:8 };
-			arr.writeObject(obj);
-			var tmp:TypingEffortWorker = new TypingEffortWorker();
-			
-			tmp.sendData(arr);
 		}
 		
 		private function showMenu():void

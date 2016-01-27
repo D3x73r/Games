@@ -20,6 +20,8 @@ package data
 		public const EVENT_MAIN_DB_CREATED:String = 'event_main_db_created';
 		public const EVENT_PLAYER_REGSTERED:String = 'event_player_regstered';
 		public const EVENT_STATS_INSERTED:String = 'event_stats_inserted';
+		public const EVENT_START_WORDS_REORDEREDING:String = 'event_start_words_reordereding';
+		public const EVENT_WORDS_REORDERED:String = 'event_words_reordered';
 		
 		public const MAIN_DB_NAME:String = 'STypers.db';
 		public const STATS_DB_NAME:String = 'STypersStats.db';
@@ -35,6 +37,13 @@ package data
 		//Stats
 		private var _allStats:Array;
 		private var _scores:Array;
+		
+		private var _indexErrCount:int;
+		private var _middleErrCount:int;
+		private var _ringErrCount:int;
+		private var _pinkyErrCount:int;
+		private var _lHandErrCount:int;
+		private var _rHandErrCount:int;
 		
 		public function DBConnect()
 		{
@@ -57,12 +66,12 @@ package data
 		private function doSavePlayerScore($player:Player):void
 		{
 			var counter:int = 0;
-			var indexErrCount:int = $player.stats.indexFingerErrCount;
-			var middleErrCount:int = $player.stats.middleFingerErrCount;
-			var ringErrCount:int = $player.stats.ringFingerErrCount;
-			var pinkyErrCount:int = $player.stats.pinkyFingerErrCount;
-			var lHandErrCount:int = $player.stats.leftHandErrCount;
-			var rHandErrCount:int = $player.stats.rightHandErrCount;
+			_indexErrCount = $player.stats.indexFingerErrCount;
+			_middleErrCount = $player.stats.middleFingerErrCount;
+			_ringErrCount = $player.stats.ringFingerErrCount;
+			_pinkyErrCount = $player.stats.pinkyFingerErrCount;
+			_lHandErrCount = $player.stats.leftHandErrCount;
+			_rHandErrCount = $player.stats.rightHandErrCount;
 			var currentDate:Date = new Date();
 			var weakFinger:String;
 			var weakHand:String;
@@ -73,44 +82,50 @@ package data
 				var lastStat:Object = _allStats[_allStats.length - 1]; 
 				var days:int = int(((((currentDate.getTime() - lastStat.date) / 1000) / 60) / 60) / 24);
 				
-				if (days < 30 && lastStat.counter <= 100)
+				if (days < 30)
 				{
 					counter = lastStat.counter + 1;
 					
-					indexErrCount += lastStat.indexErrCount;
-					middleErrCount +=  lastStat.middleErrCount;
-					ringErrCount += lastStat.ringErrCount;
-					pinkyErrCount += lastStat.pinkyErrCount
+					_indexErrCount += lastStat.indexErrCount;
+					_middleErrCount +=  lastStat.middleErrCount;
+					_ringErrCount += lastStat.ringErrCount;
+					_pinkyErrCount += lastStat.pinkyErrCount;
 					
-					lHandErrCount += lastStat.lHandErrCount;
-					rHandErrCount += lastStat.rHandErrCount;
+					_lHandErrCount += lastStat.lHandErrCount;
+					_rHandErrCount += lastStat.rHandErrCount;
+						
+					if (lastStat.counter > 100)
+					{
+						dispatchEvent(new Event(EVENT_START_WORDS_REORDEREDING));
+					}
 				}
+				
 			}
 			
-			maxErrCount = indexErrCount;
+			maxErrCount = _indexErrCount;
 			weakFinger = 'index';
-			if (middleErrCount > maxErrCount) 
+			if (_middleErrCount > maxErrCount) 
 			{
-				maxErrCount = middleErrCount;
+				maxErrCount = _middleErrCount;
 				weakFinger = 'middle';
 			}
-			if (ringErrCount > maxErrCount) 
+			if (_ringErrCount > maxErrCount) 
 			{
-				maxErrCount = ringErrCount;
+				maxErrCount = _ringErrCount;
 				weakFinger = 'ring';
 			}
-			if (ringErrCount > maxErrCount) 
+			if (_pinkyErrCount > maxErrCount) 
 			{
-				maxErrCount = ringErrCount;
+				maxErrCount = _pinkyErrCount;
 				weakFinger = 'pinky';
 			}
 			
-			if (indexErrCount == 0 && middleErrCount == 0 && ringErrCount == 0 && pinkyErrCount == 0) weakFinger = 'none';
+			if (_indexErrCount == 0 && _middleErrCount == 0 && _ringErrCount == 0 && _pinkyErrCount == 0) weakFinger = 'none';
 			
-			if (lHandErrCount > rHandErrCount) weakHand = 'left';
+			if (_lHandErrCount > _rHandErrCount) weakHand = 'left';
 			else weakHand = 'right';
 			
-			if (lHandErrCount == 0 && rHandErrCount == 0) weakHand = 'none';
+			if (_lHandErrCount == 0 && _rHandErrCount == 0) weakHand = 'none';
 			
 			var q:SQLStatement = new SQLStatement();
 			var qText:String = "INSERT  INTO 'Stats' VALUES( NULL, :playerId, :score, :wpm, :accuracy, :weakHand, :weakFinger, :date, :indexErrCount, :middleErrCount, :ringErrCount, :pinkyErrCount, :lHandErrCount, :rHandErrCount, :counter, :keyBoardId)";
@@ -125,12 +140,12 @@ package data
 			q.parameters[':weakHand'] = weakHand;
 			q.parameters[':weakFinger'] = weakFinger;
 			q.parameters[':date'] = new Date().getTime();
-			q.parameters[':indexErrCount'] = indexErrCount;
-			q.parameters[':middleErrCount'] = middleErrCount;
-			q.parameters[':ringErrCount'] = ringErrCount;
-			q.parameters[':pinkyErrCount'] = pinkyErrCount;
-			q.parameters[':lHandErrCount'] = lHandErrCount;
-			q.parameters[':rHandErrCount'] = rHandErrCount;
+			q.parameters[':indexErrCount'] = _indexErrCount;
+			q.parameters[':middleErrCount'] = _middleErrCount;
+			q.parameters[':ringErrCount'] = _ringErrCount;
+			q.parameters[':pinkyErrCount'] = _pinkyErrCount;
+			q.parameters[':lHandErrCount'] = _lHandErrCount;
+			q.parameters[':rHandErrCount'] = _rHandErrCount;
 			q.parameters[':counter'] = counter;
 			q.parameters[':keyBoardId'] = $player.stats.keyboardId;
 			
@@ -372,6 +387,36 @@ package data
 		public function get scores():Array 
 		{
 			return _scores;
+		}
+		
+		public function get indexErrCount():int 
+		{
+			return _indexErrCount;
+		}
+		
+		public function get middleErrCount():int 
+		{
+			return _middleErrCount;
+		}
+		
+		public function get ringErrCount():int 
+		{
+			return _ringErrCount;
+		}
+		
+		public function get pinkyErrCount():int 
+		{
+			return _pinkyErrCount;
+		}
+		
+		public function get lHandErrCount():int 
+		{
+			return _lHandErrCount;
+		}
+		
+		public function get rHandErrCount():int 
+		{
+			return _rHandErrCount;
 		}
 	}
 
