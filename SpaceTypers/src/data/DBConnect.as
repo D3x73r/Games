@@ -44,6 +44,9 @@ package data
 		private var _pinkyErrCount:int;
 		private var _lHandErrCount:int;
 		private var _rHandErrCount:int;
+		private var _row1ErrCount:int;
+		private var _row2ErrCount:int;
+		private var _row3ErrCount:int;
 		
 		public function DBConnect()
 		{
@@ -66,16 +69,23 @@ package data
 		private function doSavePlayerScore($player:Player):void
 		{
 			var counter:int = 0;
-			_indexErrCount = $player.stats.indexFingerErrCount;
-			_middleErrCount = $player.stats.middleFingerErrCount;
-			_ringErrCount = $player.stats.ringFingerErrCount;
-			_pinkyErrCount = $player.stats.pinkyFingerErrCount;
-			_lHandErrCount = $player.stats.leftHandErrCount;
-			_rHandErrCount = $player.stats.rightHandErrCount;
 			var currentDate:Date = new Date();
 			var weakFinger:String;
 			var weakHand:String;
 			var maxErrCount:int;
+			
+			_indexErrCount = $player.stats.indexFingerErrCount;
+			_middleErrCount = $player.stats.middleFingerErrCount;
+			_ringErrCount = $player.stats.ringFingerErrCount;
+			_pinkyErrCount = $player.stats.pinkyFingerErrCount;
+			
+			_lHandErrCount = $player.stats.leftHandErrCount;
+			_rHandErrCount = $player.stats.rightHandErrCount;
+			
+			_row1ErrCount = $player.stats.row1ErrCount;
+			_row2ErrCount = $player.stats.row2ErrCount;
+			_row3ErrCount = $player.stats.row3ErrCount;
+			
 			
 			if (_allStats != null && _allStats.length > 0)
 			{
@@ -93,7 +103,11 @@ package data
 					
 					_lHandErrCount += lastStat.lHandErrCount;
 					_rHandErrCount += lastStat.rHandErrCount;
-						
+					
+					_row1ErrCount += lastStat.row1ErrCount;
+					_row2ErrCount += lastStat.row2ErrCount;
+					_row3ErrCount += lastStat.row3ErrCount;
+					
 					if (lastStat.counter > 100)
 					{
 						dispatchEvent(new Event(EVENT_START_WORDS_REORDEREDING));
@@ -128,7 +142,7 @@ package data
 			if (_lHandErrCount == 0 && _rHandErrCount == 0) weakHand = 'none';
 			
 			var q:SQLStatement = new SQLStatement();
-			var qText:String = "INSERT  INTO 'Stats' VALUES( NULL, :playerId, :score, :wpm, :accuracy, :weakHand, :weakFinger, :date, :indexErrCount, :middleErrCount, :ringErrCount, :pinkyErrCount, :lHandErrCount, :rHandErrCount, :counter, :keyBoardId)";
+			var qText:String = "INSERT  INTO 'Stats' VALUES( NULL, :playerId, :score, :wpm, :accuracy, :weakHand, :weakFinger, :date, :indexErrCount, :middleErrCount, :ringErrCount, :pinkyErrCount, :lHandErrCount, :rHandErrCount, :counter, :keyBoardId, :row1ErrCount, :row2ErrCount, :row3ErrCount)";
 			
 			q.sqlConnection = _connMainDB;
 			q.clearParameters();
@@ -148,6 +162,9 @@ package data
 			q.parameters[':rHandErrCount'] = _rHandErrCount;
 			q.parameters[':counter'] = counter;
 			q.parameters[':keyBoardId'] = $player.stats.keyboardId;
+			q.parameters[':row1ErrCount'] = _row1ErrCount;
+			q.parameters[':row2ErrCount'] = _row2ErrCount;
+			q.parameters[':row3ErrCount'] = _row3ErrCount;
 			
 			q.addEventListener(SQLEvent.RESULT, onStatsInsert);
 			q.addEventListener(SQLErrorEvent.ERROR, onDBError);
@@ -274,7 +291,7 @@ package data
 			
 			var stat:SQLStatement = new SQLStatement();
 			stat.sqlConnection = _connMainDB;
-			stat.text = "CREATE TABLE IF NOT EXISTS Stats (id INTEGER PRIMARY KEY AUTOINCREMENT, " + "playerId INTEGER, score INTEGER, wpm INTEGER, accuracy REAL, weakHand TEXT, weakFinger TEXT, " + "date REAL, indexErrCount INTEGER, middleErrCount INTEGER, ringErrCount INTEGER, " + "pinkyErrCount INTEGER, lHandErrCount INTEGER, rHandErrCount INTEGER, counter INTEGER, keyBoardId INTEGER)";
+			stat.text = "CREATE TABLE IF NOT EXISTS Stats (id INTEGER PRIMARY KEY AUTOINCREMENT, " + "playerId INTEGER, score INTEGER, wpm INTEGER, accuracy REAL, weakHand TEXT, weakFinger TEXT, " + "date REAL, indexErrCount INTEGER, middleErrCount INTEGER, ringErrCount INTEGER, " + "pinkyErrCount INTEGER, lHandErrCount INTEGER, rHandErrCount INTEGER, counter INTEGER, keyBoardId INTEGER, row1ErrCount INTEGER, row2ErrCount INTEGER, row3ErrCount INTEGER)";
 			stat.execute();
 		
 		}
@@ -417,6 +434,21 @@ package data
 		public function get rHandErrCount():int 
 		{
 			return _rHandErrCount;
+		}
+		
+		public function get row1ErrCount():int 
+		{
+			return _row1ErrCount;
+		}
+		
+		public function get row2ErrCount():int 
+		{
+			return _row2ErrCount;
+		}
+		
+		public function get row3ErrCount():int 
+		{
+			return _row3ErrCount;
 		}
 	}
 

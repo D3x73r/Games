@@ -5,7 +5,7 @@ package utils.typingeffort
 	 * @author Hristo Dimitrov F43841
 	 */
 	
-	public final class TypingEffort
+	public final class TypingEffort 
 	{
 		private static var _typingEffort:Number;
 		private static var _triadEffort:Number;
@@ -21,48 +21,44 @@ package utils.typingeffort
 		private static var _cacheTriadEffort:Number;
 		
 		//Effort component weights 
-		private static var _effBaseFactor:Number = ConfigEffort.EFFORT_BASE_FACTOR;
-		private static var _effPenaltyFactor:Number = ConfigEffort.EFFORT_PENALTY_FACTOR;
-		private static var _effStrokeFactor:Number = ConfigEffort.EFFORT_STROKE_FACTOR;
+		private static var _effBaseFactor:Number = Config.EFFORT_BASE_FACTOR;
+		private static var _effPenaltyFactor:Number = Config.EFFORT_PENALTY_FACTOR;
+		private static var _effStrokeFactor:Number = Config.EFFORT_STROKE_FACTOR;
 		
 		//Penalty weights
-		private static var _wHand:Number = ConfigEffort.W_HAND;
-		private static var _wRow:Number = ConfigEffort.W_ROW;
-		private static var _wFinger:Number = ConfigEffort.W_FINGER;
+		private static var _wHand:Number = Config.W_HAND;
+		private static var _wRow:Number = Config.W_ROW;
+		private static var _wFinger:Number = Config.W_FINGER;
 		
 		//Finger / Hand pealties
-		private static var _indexFingerPenalty:Number = ConfigEffort.INDEX_FINGER_PANALTY;
-		private static var _middleFingerPenalty:Number = ConfigEffort.MIDDLE_FINGER_PANALTY;
-		private static var _ringFingerPenalty:Number = ConfigEffort.RING_FINGER_PANALTY;
-		private static var _pinkyFingerPenalty:Number = ConfigEffort.PINKY_FINGER_PANALTY;
+		private static var _indexFingerPenalty:Number = Config.INDEX_FINGER_PANALTY;
+		private static var _middleFingerPenalty:Number = Config.MIDDLE_FINGER_PANALTY;
+		private static var _ringFingerPenalty:Number = Config.RING_FINGER_PANALTY;
+		private static var _pinkyFingerPenalty:Number = Config.PINKY_FINGER_PANALTY;
 		
-		private static var _lhandAdditionalPenalty:Number = ConfigEffort.LHAND_FINGER_ADDITIONAL_PENALTY;
-		private static var _rhandAdditionalPenalty:Number = ConfigEffort.RHAND_FINGER_ADDITIONAL_PENALTY;
+		private static var _lhandAdditionalPenalty:Number = Config.LHAND_FINGER_ADDITIONAL_PENALTY;
+		private static var _rhandAdditionalPenalty:Number = Config.RHAND_FINGER_ADDITIONAL_PENALTY;
 		
 		//triad interaction parameters
-		private static var _triadK1:Number = ConfigEffort.TRIAD_K_1;
-		private static var _triadK2:Number = ConfigEffort.TRIAD_K_2;
-		private static var _triadK3:Number = ConfigEffort.TRIAD_K_3;
+		private static var _triadK1:Number = Config.TRIAD_K_1;
+		private static var _triadK2:Number = Config.TRIAD_K_2;
+		private static var _triadK3:Number = Config.TRIAD_K_3;
 		
 		//Stroke contributor params
-		private static var _fHand:Number = ConfigEffort.F_HAND;
-		private static var _fRow:Number = ConfigEffort.F_ROW;
-		private static var _fFinger:Number = ConfigEffort.F_FINGER;
+		private static var _fHand:Number = Config.F_HAND;
+		private static var _fRow:Number = Config.F_ROW;
+		private static var _fFinger:Number = Config.F_FINGER;
 		
-		public function TypingEffort()
-		{
-			
-		}
 		
-		public function calc($word:String):Number {
+		public static function calc($word:String, $keyBoardId:int):Number {
 			_typingEffort = 0.0;
 			_currentTriad = '';
 			
 			for (var i:int = 0; i <= $word.length - 3; i++ ) {
 				_currentTriad = $word.substr(i, 3);
-				_l1 = Letters.getMap(_currentTriad.substr(0, 1));
-				_l2 = Letters.getMap(_currentTriad.substr(1, 1));
-				_l3 = Letters.getMap(_currentTriad.substr(2, 1));
+				_l1 = Letters.getMap(_currentTriad.substr(0, 1), $keyBoardId);
+				_l2 = Letters.getMap(_currentTriad.substr(1, 1), $keyBoardId);
+				_l3 = Letters.getMap(_currentTriad.substr(2, 1), $keyBoardId);
 				_triadEffort = 0.0;
 				
 				_typingEffort += (_effBaseFactor * calcBase() 

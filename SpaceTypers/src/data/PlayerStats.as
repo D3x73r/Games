@@ -23,6 +23,9 @@ package data
 		private var _middleFingerErrCount:int = 0;
 		private var _ringFingerErrCount:int = 0;
 		private var _pinkyFingerErrCount:int = 0;
+		private var _row1ErrCount:int = 0;
+		private var _row2ErrCount:int = 0;
+		private var _row3ErrCount:int = 0;
 		private var _timeMain:Number = 0;
 		private var _completedWords:int = 0;
 		private var _keyboardId:int = -1;
@@ -97,6 +100,19 @@ package data
 			else
 			{
 				leftHandErrCount++;
+			}
+			
+			switch($letterMap.row)
+			{
+				case 1:
+					_row1ErrCount++;
+					break;
+				case 2:
+					_row2ErrCount++;
+					break;
+				case 3:
+					_row3ErrCount++;
+					break;
 			}
 		}
 		
@@ -189,6 +205,21 @@ package data
 		public function get keyboardId():int 
 		{
 			return _keyboardId;
+		}
+		
+		public function get row1ErrCount():int 
+		{
+			return _row1ErrCount;
+		}
+		
+		public function get row2ErrCount():int 
+		{
+			return _row2ErrCount;
+		}
+		
+		public function get row3ErrCount():int 
+		{
+			return _row3ErrCount;
 		}
 	
 	}

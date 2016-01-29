@@ -18,6 +18,9 @@ package utils.typingeffort
 		private var _backToMain:MessageChannel;
 		private var _mainToBack:MessageChannel;
 		
+		private var _words:Array;
+		private var _config:Object;
+		
 		public function EffortCalculator() 
 		{
 			super();
@@ -38,7 +41,8 @@ package utils.typingeffort
 			_memory.position = 0; //To start at the beginning;
 			
 			var obj:Object = _memory.readObject();
-			
+			_words = obj.words;
+			_config = obj.config;
 			_backToMain.send(obj.x + obj.y);
 		}
 		

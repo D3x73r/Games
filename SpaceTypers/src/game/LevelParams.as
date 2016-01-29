@@ -23,6 +23,8 @@ package game
 		private const _KEYBOARDS:Vector.<String> = new <String>['_qwerty', '_dvorak', '_colemak'];
 		
 		private var _codeNames:Array;
+		private var _allCodeNames:Array;
+		private var _config:Object;
 		private var _level:int;
 		private var _keyBoardId:int;
 		private var _playerId:int;
@@ -44,7 +46,7 @@ package game
 				var startId:int = _level < 10 ? 0 : _level - 10;
 				var endId:int = int( ( ( _codeNames.length - 1 )  * _level) / 100);
 				
-				_codeNames = _codeNames.slice(startId, endId);
+				_codeNames = _allCodeNames.slice(startId, endId);
 				
 				//
 				//for (var i:int = 0;  i < _codeNames.length; i++ )
@@ -77,13 +79,16 @@ package game
 			var loader:URLLoader = $e.target as URLLoader;
 			var dataObj:ByteArray = loader.data as ByteArray;
 			var obj:Object = dataObj.readObject();
-			var tmpArr:Array = obj.words;
+			
+			_allCodeNames = obj.words;
+			_config = obj.config;
+			
 			var startId:int = _level < 10 ? 0 : _level - 10;
-			var endId:int = int( ( ( tmpArr.length - 1 )  * _level) / 100);
+			var endId:int = int( ( ( _allCodeNames.length - 1 )  * _level) / 100);
 			
 			wordsLoaded = true;
 			
-			_codeNames = tmpArr.slice(startId, endId);
+			_codeNames = _allCodeNames.slice(startId, endId);
 			
 			for (var i:int = 0;  i < _codeNames.length; i++ )
 			{
@@ -101,6 +106,11 @@ package game
 		public function get keyBoardId():int 
 		{
 			return _keyBoardId;
+		}
+		
+		public function get allCodeNames():Array 
+		{
+			return _allCodeNames;
 		}
 	}
 }

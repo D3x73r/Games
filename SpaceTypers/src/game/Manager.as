@@ -159,7 +159,21 @@ package game
 						//get err counts from db connect and rearange new values for the penalties
 						// then send to worker for reorderting...
 						var arr:ByteArray = new ByteArray();
-						var obj:Object = { x:5, y:8 };
+						var obj:Object = { 
+											config: 
+												{
+													indexErrCount:dbConnect.indexErrCount, 
+													middleErrCount:dbConnect.middleErrCount, 
+													ringErrCount:dbConnect.ringErrCount, 
+													pinkyErrCount:dbConnect.pinkyErrCount, 
+													lHandErrCount:dbConnect.lHandErrCount, 
+													rHandErrCount:dbConnect.rHandErrCount, 
+													row1ErrCount:dbConnect.row1ErrCount, 
+													row2ErrCount:dbConnect.row2ErrCount, 
+													row3ErrCount:dbConnect.row3ErrCount 
+												}, 
+											words: _levelParams.allCodeNames 
+										};
 						arr.writeObject(obj);
 						
 						worker.sendData(arr);
