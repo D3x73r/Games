@@ -21,7 +21,6 @@ package data
 		public const EVENT_PLAYER_REGSTERED:String = 'event_player_regstered';
 		public const EVENT_STATS_INSERTED:String = 'event_stats_inserted';
 		public const EVENT_START_WORDS_REORDEREDING:String = 'event_start_words_reordereding';
-		public const EVENT_WORDS_REORDERED:String = 'event_words_reordered';
 		
 		public const MAIN_DB_NAME:String = 'STypers.db';
 		public const STATS_DB_NAME:String = 'STypersStats.db';
@@ -108,7 +107,7 @@ package data
 					_row2ErrCount += lastStat.row2ErrCount;
 					_row3ErrCount += lastStat.row3ErrCount;
 					
-					if (lastStat.counter > 100)
+					if (lastStat.counter > 1)
 					{
 						dispatchEvent(new Event(EVENT_START_WORDS_REORDEREDING));
 					}
@@ -374,11 +373,6 @@ package data
 			}
 			
 			return playerInfo;
-		}
-		
-		public function syncPlayerProgress($playerInfo:Player):void
-		{
-		
 		}
 		
 		public function get allPlayers():Vector.<Player>

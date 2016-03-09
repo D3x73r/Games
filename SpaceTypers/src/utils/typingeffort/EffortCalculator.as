@@ -43,7 +43,9 @@ package utils.typingeffort
 			var obj:Object = _memory.readObject();
 			_words = obj.words;
 			_config = obj.config;
-			_backToMain.send(obj.x + obj.y);
+			trace('worker recieved shit@!@')
+			trace(obj.config.indexErrCount, obj.config.middleErrCount, obj.config.ringErrCount, obj.config.pinkyErrCount, obj.config.lHandErrCount, obj.config.rHandErrCount, obj.config.row1ErrCount, obj.config.row2ErrCount, obj.config.row3ErrCount);
+			_backToMain.send(3);
 		}
 		
 	}

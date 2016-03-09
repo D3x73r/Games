@@ -22,6 +22,8 @@ package utils.workers
 		private var _mainToBackCh:MessageChannel;
 		private var _memory:ByteArray;
 		private var _calculating:Boolean;
+		public var test:*;
+		public const EVENT_WORDS_REORDERED:String = 'event_words_reordered';
 		
 		public function TypingEffortWorker() 
 		{
@@ -45,8 +47,9 @@ package utils.workers
 			if (_backToMainCh.messageAvailable)
 			{
 				_calculating = false;
-				
-				trace(_backToMainCh.receive());
+				test = _backToMainCh.receive();
+				trace("recieve!!!!!!!!!!!!!!", test);
+				dispatchEvent(new Event(EVENT_WORDS_REORDERED));
 			}
 		}
 		
@@ -55,7 +58,7 @@ package utils.workers
 			_calculating = true;
 			_memory.length = 0;
 			_memory.writeBytes($byteArray);
-			
+			trace('sending data!!!!!!!!!!!!!!!!!')
 			_mainToBackCh.send('INCOMMING_DATA');	
 		}
 		

@@ -82,7 +82,7 @@ package game
 					];
 		private const GAME_OVER_BUTTONS:Vector.<Object> = new <Object>
 					[
-						{btnName: 'btnPlayAgain', callback: playGame },
+						{btnName: 'btnPlayAgain', callback: playGameAgain },
 						{btnName: 'btnMenu', callback: showMenu }
 					];
 					
@@ -94,6 +94,7 @@ package game
 		
 		// Lists
 		public var list_players:List;
+		public var txt_test:TextField;
 		
 		//game components
 		private var _ship:Ship;
@@ -154,14 +155,7 @@ package game
 			dbConnect = new DBConnect(); //connect to DataBase
 			
 			dbConnect.addEventListener(dbConnect.EVENT_START_WORDS_REORDEREDING, function() {
-					if (!worker.calculating)
-					{
-						//get err counts from db connect and rearange new values for the penalties
-						// then send to worker for reorderting...
-						var arr:ByteArray = new ByteArray();
-						var obj:Object = { 
-											config: 
-												{
+					var config:Object = {
 													indexErrCount:dbConnect.indexErrCount, 
 													middleErrCount:dbConnect.middleErrCount, 
 													ringErrCount:dbConnect.ringErrCount, 
@@ -171,7 +165,15 @@ package game
 													row1ErrCount:dbConnect.row1ErrCount, 
 													row2ErrCount:dbConnect.row2ErrCount, 
 													row3ErrCount:dbConnect.row3ErrCount 
-												}, 
+												};
+					if (!worker.calculating && _levelParams.reorderNeeded(config))
+					{
+						trace('start words reordering');
+						//get err counts from db connect and rearange new values for the penalties
+						// then send to worker for reorderting...
+						var arr:ByteArray = new ByteArray();
+						var obj:Object = { 
+											config:config, 
 											words: _levelParams.allCodeNames 
 										};
 						arr.writeObject(obj);
@@ -179,7 +181,8 @@ package game
 						worker.sendData(arr);
 					}
 				});
-			dbConnect.addEventListener(dbConnect.EVENT_WORDS_REORDERED, function() {
+			worker.addEventListener(worker.EVENT_WORDS_REORDERED, function() {
+					txt_test.text = 'words reordered worker logic working' + ' ' + worker.test;
 					LevelParams.wordsLoaded = false;
 				});
 				
@@ -213,7 +216,7 @@ package game
 					
 					for each (var player:Player in dbConnect.allPlayers)
 					{
-						trace(dbConnect.allPlayers.length);
+						//trace(dbConnect.allPlayers.length);
 						
 						list_players.addItem({label: player.playerId + '. ' + player.nick, player: player});
 					}
@@ -322,7 +325,9 @@ package game
 				//trace('k=', k)
 				setTimeout(function()
 					{
+						
 						var randomId:int = random(0, _levelParams.codeNames.length - 1);
+						//trace("level params", _levelParams.codeNames[randomId]);
 						var codeName:CodeName = new CodeName(_levelParams.codeNames[randomId].word, -25, -10, _levelParams.codeNames[randomId].effort);
 						var asteroid:Asteroid = new Asteroid(codeName, randomNumber(0.2, 0.6));
 						
@@ -476,6 +481,33 @@ package game
 			}
 		}
 		
+		private function playGameAgain():void
+		{
+			trace('===========================================================again')
+			if (keyboardsList) keyBoardId = keyboardsList.selectedIndex;
+			if (keyBoardId == -1)
+			{
+				txtHint.text = Lang.HINT_KEYBOARD;
+			}
+			else
+			{
+				transition.show(function () 
+					{
+						dbConnect.addEventListener(dbConnect.EVENT_STATS_INSERTED, function onStatsInserted() {
+								dbConnect.removeEventListener(dbConnect.EVENT_STATS_INSERTED, onStatsInserted);
+								_currentPlayer.stats = null;
+								
+								_level = 1;
+								_asteroidsPerLevel = 2;
+									
+								state = STATE_GAME;
+							});
+							
+						dbConnect.savePlayerScore(_currentPlayer);
+					});
+			}
+		}
+		
 		private function showPlayerStats():void
 		{
 			
@@ -505,7 +537,7 @@ package game
 		{
 			if ($e.keyCode == Keyboard.SPACE && state == STATE_INTRO)
 			{
-				trace(dbConnect.dataLoadedMainDB);
+				//trace(dbConnect.dataLoadedMainDB);
 				if (dbConnect.dataLoadedMainDB)
 				{
 					onDataLoaded();
